@@ -35,7 +35,6 @@ const CreateVisualsSection: React.FC = () => {
     setVideoType,
     lyrics,
     setLyrics,
-    setShowLyricEditor,
   } = useAppContext();
 
   return (
@@ -137,9 +136,6 @@ const CreateVisualsSection: React.FC = () => {
               value={lyrics}
               onChange={(e) => setLyrics(e.target.value)}
             />
-            <Button onClick={() => setShowLyricEditor(true)} className="mt-2">
-              Edit Lyric Timing
-            </Button>
           </div>
         )}
       </CardContent>

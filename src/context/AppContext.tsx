@@ -47,8 +47,6 @@ interface IAppContext {
   generatedVideoUrl: string | null;
   generatedImageUrl: string | null;
   generate: () => void;
-  showLyricEditor: boolean;
-  setShowLyricEditor: (show: boolean) => void;
 }
 
 // Create the context
@@ -77,7 +75,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
     null
   );
-  const [showLyricEditor, setShowLyricEditor] = useState(false);
 
   const fetchLogo = async () => {
     try {
@@ -162,8 +159,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
     generatedVideoUrl,
     generatedImageUrl,
     generate: handleGenerate,
-    showLyricEditor,
-    setShowLyricEditor,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

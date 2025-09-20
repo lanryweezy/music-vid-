@@ -61,20 +61,6 @@ const UploadAndAnalyzeSection: React.FC = () => {
                 <strong>Chords</strong>
                 <span>{analysisResult.chords.join(', ')}</span>
               </div>
-              <div className="flex justify-between">
-                <strong>Key</strong>
-                <span>{analysisResult.key}</span>
-              </div>
-              <div>
-                <strong>Structure</strong>
-                <ul className="list-disc list-inside">
-                  {analysisResult.structure.map((part, index) => (
-                    <li key={index}>
-                      {part.part}: {part.start}s - {part.end}s
-                    </li>
-                  ))}
-                </ul>
-              </div>
             </div>
           )}
           <div className="metronome">

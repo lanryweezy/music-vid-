@@ -42,8 +42,6 @@ export const generateLogo = async (): Promise<string> => {
 export interface AnalysisResult {
   bpm: number;
   chords: string[];
-  key: string;
-  structure: { part: string; start: number; end: number }[];
 }
 
 export const analyzeAudio = async (
@@ -51,7 +49,6 @@ export const analyzeAudio = async (
 ): Promise<AnalysisResult> => {
   try {
     const audioPart = await fileToGenerativePart(audioFile);
-    const prompt = `Analyze this audio file. Determine its BPM (Beats Per Minute), primary chord progression, musical key, and song structure (e.g., verse, chorus, bridge). Respond ONLY with a JSON object containing 'bpm' (as a number), 'chords' (as an array of strings), 'key' (as a string), and 'structure' (as an array of objects with 'part', 'start', and 'end' properties in seconds).`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
@@ -65,18 +62,6 @@ export const analyzeAudio = async (
             chords: {
               type: Type.ARRAY,
               items: { type: Type.STRING },
-            },
-            key: { type: Type.STRING },
-            structure: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  part: { type: Type.STRING },
-                  start: { type: Type.NUMBER },
-                  end: { type: Type.NUMBER },
-                },
-              },
             },
           },
         },
