@@ -1,23 +1,4 @@
 
-
-# AI Music Video Generator
-
-The AI Music Video Generator is a powerful and intuitive web application that allows you to create stunning music videos and edit images using the power of Google's Gemini AI. Whether you're a musician looking to create a visual masterpiece for your latest track, or a creative individual looking to experiment with AI-powered art, this application provides all the tools you need to bring your vision to life.
-
-## Features
-
--   **AI-Powered Video Generation:** Create unique music videos from a text prompt, with the option to include an image as a source.
--   **AI-Powered Image Editing:** Edit your images using a text prompt to describe the changes you want to make.
--   **Lyrics Video Creation:** Generate a lyrics video with animated text for your song.
--   **Musician's Toolkit:** Analyze your audio files to get the BPM and chords, and use the built-in metronome to help you with your creative process.
--   **Customizable Visuals:** Choose from a variety of visual styles and resolutions to create the perfect look for your video.
--   **Responsive Design:** The application is fully responsive and works great on all devices.
--   **Modern UI:** The user interface is built with React and `shadcn/ui`, providing a clean and modern user experience.
-
-## Getting Started
-
-To get a local copy up and running follow these simple steps.
-
 ### Prerequisites
 
 -   Node.js (v18 or higher)

@@ -49,7 +49,6 @@ export const analyzeAudio = async (
 ): Promise<AnalysisResult> => {
   try {
     const audioPart = await fileToGenerativePart(audioFile);
-    const prompt = `Analyze this audio file. Determine its BPM (Beats Per Minute) and the primary chord progression. Respond ONLY with a JSON object containing 'bpm' (as a number) and 'chords' (as an array of strings representing the main chords, e.g., ["C", "G", "Am", "F"]).`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
