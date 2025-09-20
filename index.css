@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css);
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;500;700&display=swap');
 
@@ -452,7 +456,7 @@ button:disabled {
   text-align: center;
 }
 
-.video-actions button {
+.video-actions a {
   width: auto;
   font-size: 1rem;
 }
@@ -658,6 +662,11 @@ button:disabled {
 .autocomplete-suggestions div:hover,
 .autocomplete-suggestions div.selected {
   background-color: var(--tertiary-color);
+}
+
+.error {
+    color: var(--error-color);
+    text-align: center;
 }
 
 @media (max-width: 600px) {
