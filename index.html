@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;500;700&family=Lobster&family=Courier+Prime&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="index.css" />
@@ -69,6 +69,14 @@
                 <div class="result-item">
                   <strong><i class="fa-solid fa-music"></i> Chords</strong>
                   <span id="chords-result"></span>
+                </div>
+                <div class="result-item">
+                  <strong><i class="fa-solid fa-key"></i> Key</strong>
+                  <span id="key-result"></span>
+                </div>
+                <div class="result-item">
+                  <strong><i class="fa-solid fa-diagram-project"></i> Structure</strong>
+                  <span id="structure-result"></span>
                 </div>
               </div>
               <div class="metronome">
@@ -221,6 +229,33 @@
                 rows="8"
                 placeholder="Paste your song lyrics here..."
               ></textarea>
+              <div class="lyrics-options">
+                <div class="control-group-inline">
+                  <label for="font-select">Font</label>
+                  <select id="font-select">
+                    <option value="Roboto">Roboto</option>
+                    <option value="Bebas Neue">Bebas Neue</option>
+                    <option value="Lobster">Lobster</option>
+                    <option value="Courier Prime">Courier Prime</option>
+                  </select>
+                </div>
+                <div class="control-group-inline">
+                  <label for="font-size-input">Size</label>
+                  <input type="number" id="font-size-input" value="48" min="12" max="144" />
+                </div>
+                <div class="control-group-inline">
+                  <label for="font-color-input">Color</label>
+                  <input type="color" id="font-color-input" value="#FFFFFF" />
+                </div>
+                <div class="control-group-inline">
+                  <label for="animation-select">Animation</label>
+                  <select id="animation-select">
+                    <option value="fade">Fade In</option>
+                    <option value="karaoke">Karaoke Style</option>
+                    <option value="popup">Pop Up</option>
+                  </select>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -245,6 +280,9 @@
               <button id="download-video-btn" class="secondary-action">
                 <i class="fa-solid fa-download"></i> Download Video
               </button>
+              <button id="share-video-btn" class="secondary-action hidden">
+                <i class="fa-solid fa-share-alt"></i> Share
+              </button>
               <p class="download-note">
                 Note: The downloaded video will be silent. You can combine it
                 with your audio using any video editing software.
@@ -261,6 +299,30 @@
           </div>
         </div>
       </main>
+      <div id="share-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <button id="close-modal-btn" class="modal-close-btn">&times;</button>
+          <h2>Share Your Video</h2>
+          <p>Share a link to your creation!</p>
+          <div class="share-buttons">
+            <a id="share-twitter" href="#" target="_blank" class="share-btn twitter">
+              <i class="fa-brands fa-twitter"></i> X
+            </a>
+            <a id="share-facebook" href="#" target="_blank" class="share-btn facebook">
+              <i class="fa-brands fa-facebook"></i> Facebook
+            </a>
+            <a id="share-reddit" href="#" target="_blank" class="share-btn reddit">
+              <i class="fa-brands fa-reddit-alien"></i> Reddit
+            </a>
+          </div>
+          <div class="copy-link-container">
+            <input type="text" id="share-link-input" readonly />
+            <button id="copy-link-btn">
+              <i class="fa-solid fa-copy"></i> Copy
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <audio id="audio-player" style="display: none"></audio>
     <script type="module" src="/index.tsx"></script>

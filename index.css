@@ -660,6 +660,133 @@ button:disabled {
   background-color: var(--tertiary-color);
 }
 
+/* Share Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--surface-color);
+  padding: 2.5rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  text-align: center;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--placeholder-color);
+  cursor: pointer;
+}
+
+.modal-content h2 {
+  font-family: var(--heading-font);
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+}
+
+.modal-content p {
+  margin-bottom: 2rem;
+  color: var(--on-background-color);
+}
+
+.share-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  transition: opacity 0.2s;
+}
+
+.share-btn:hover {
+  opacity: 0.8;
+}
+
+.share-btn.twitter { background-color: #1DA1F2; }
+.share-btn.facebook { background-color: #1877F2; }
+.share-btn.reddit { background-color: #FF4500; }
+
+.copy-link-container {
+  display: flex;
+}
+
+.copy-link-container input {
+  flex-grow: 1;
+  border-right: none;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.copy-link-container button {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  width: auto;
+  padding: 0 1rem;
+  background-color: var(--secondary-color);
+  color: #fff;
+}
+
+/* Lyric Editor Options */
+.lyrics-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  background-color: var(--background-color);
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  border: 1px solid var(--border-color);
+}
+
+.control-group-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.control-group-inline label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 0;
+}
+
+.control-group-inline input[type='color'] {
+  padding: 0;
+  height: 44px; /* Match height of other inputs */
+  border: none;
+  background: none;
+  width: 100%;
+}
+
 @media (max-width: 600px) {
   body {
     padding: 1rem;

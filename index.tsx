@@ -25,6 +25,10 @@ const videoTypeVisual = document.getElementById('video-type-visual') as HTMLInpu
 const videoTypeLyrics = document.getElementById('video-type-lyrics') as HTMLInputElement;
 const lyricsGroup = document.getElementById('lyrics-group') as HTMLDivElement;
 const lyricsInput = document.getElementById('lyrics-input') as HTMLTextAreaElement;
+const fontSelect = document.getElementById('font-select') as HTMLSelectElement;
+const fontSizeInput = document.getElementById('font-size-input') as HTMLInputElement;
+const fontColorInput = document.getElementById('font-color-input') as HTMLInputElement;
+const animationSelect = document.getElementById('animation-select') as HTMLSelectElement;
 const generateBtn = document.getElementById('generate-btn') as HTMLButtonElement;
 const outputArea = document.getElementById('output-area') as HTMLDivElement;
 const outputPlaceholder = document.getElementById('output-placeholder') as HTMLDivElement;
@@ -34,9 +38,19 @@ const videoResult = document.getElementById('video-result') as HTMLDivElement;
 const videoPlayer = document.getElementById('video-player') as HTMLVideoElement;
 const audioPlayer = document.getElementById('audio-player') as HTMLAudioElement;
 const downloadVideoBtn = document.getElementById('download-video-btn') as HTMLButtonElement;
+const shareVideoBtn = document.getElementById('share-video-btn') as HTMLButtonElement;
 const imageResult = document.getElementById('image-result') as HTMLDivElement;
 const imageViewer = document.getElementById('image-viewer') as HTMLImageElement;
 const downloadImageBtn = document.getElementById('download-image-btn') as HTMLButtonElement;
+
+// Share Modal Elements
+const shareModal = document.getElementById('share-modal') as HTMLDivElement;
+const closeModalBtn = document.getElementById('close-modal-btn') as HTMLButtonElement;
+const shareTwitter = document.getElementById('share-twitter') as HTMLAnchorElement;
+const shareFacebook = document.getElementById('share-facebook') as HTMLAnchorElement;
+const shareReddit = document.getElementById('share-reddit') as HTMLAnchorElement;
+const shareLinkInput = document.getElementById('share-link-input') as HTMLInputElement;
+const copyLinkBtn = document.getElementById('copy-link-btn') as HTMLButtonElement;
 
 // Prompt Editor Elements
 const promptBoldBtn = document.getElementById('prompt-bold-btn') as HTMLButtonElement;
@@ -52,6 +66,8 @@ const analysisLoader = document.getElementById('analysis-loader') as HTMLDivElem
 const analysisResult = document.getElementById('analysis-result') as HTMLDivElement;
 const bpmResult = document.getElementById('bpm-result') as HTMLSpanElement;
 const chordsResult = document.getElementById('chords-result') as HTMLSpanElement;
+const keyResult = document.getElementById('key-result') as HTMLSpanElement;
+const structureResult = document.getElementById('structure-result') as HTMLSpanElement;
 const metronomeBpm = document.getElementById('metronome-bpm') as HTMLInputElement;
 const metronomeToggle = document.getElementById('metronome-toggle') as HTMLButtonElement;
 
@@ -71,7 +87,7 @@ let audioContext: AudioContext;
 
 
 // --- Gemini API Initialization ---
-const ai = new GoogleGenAI({apiKey: process.env.API_KEY!});
+const ai = new GoogleGenAI({apiKey: import.meta.env.VITE_GEMINI_API_KEY!});
 
 // --- Constants ---
 const visualTemplates = [
@@ -151,6 +167,9 @@ templateGallery.addEventListener('click', handleTemplateSelect);
 generateBtn.addEventListener('click', handleGenerateClick);
 downloadVideoBtn.addEventListener('click', handleVideoDownload);
 downloadImageBtn.addEventListener('click', handleImageDownload);
+shareVideoBtn.addEventListener('click', handleShareClick);
+closeModalBtn.addEventListener('click', () => shareModal.classList.add('hidden'));
+copyLinkBtn.addEventListener('click', copyShareLink);
 videoPlayer.addEventListener('play', () => audioPlayer.play());
 videoPlayer.addEventListener('pause', () => audioPlayer.pause());
 videoPlayer.addEventListener('seeking', () => {
@@ -587,7 +606,7 @@ async function analyzeAudio() {
 
   try {
     const audioPart = await fileToGenerativePart(audioFile);
-    const prompt = `Analyze this audio file. Determine its BPM (Beats Per Minute) and the primary chord progression. Respond ONLY with a JSON object containing 'bpm' (as a number) and 'chords' (as an array of strings representing the main chords, e.g., ["C", "G", "Am", "F"]).`;
+    const prompt = `Analyze this audio file. Determine its BPM (Beats Per Minute), primary chord progression, musical key, and overall structure (e.g., Intro, Verse, Chorus, Bridge, Outro). Respond ONLY with a JSON object containing 'bpm' (as a number), 'chords' (as an array of strings), 'key' (as a string, e.g., "C Major"), and 'structure' (as an array of strings).`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
@@ -602,6 +621,11 @@ async function analyzeAudio() {
               type: Type.ARRAY,
               items: {type: Type.STRING},
             },
+            key: {type: Type.STRING},
+            structure: {
+              type: Type.ARRAY,
+              items: {type: Type.STRING},
+            },
           },
         },
       },
@@ -612,6 +636,8 @@ async function analyzeAudio() {
 
     bpmResult.textContent = Math.round(result.bpm).toString();
     chordsResult.textContent = result.chords.join(', ');
+    keyResult.textContent = result.key;
+    structureResult.textContent = result.structure.join(', ');
     metronomeBpm.value = Math.round(result.bpm).toString();
 
     analysisResult.classList.remove('hidden');
@@ -778,7 +804,21 @@ async function generateVideo() {
 
   let fullPrompt = '';
   if (isLyricsVideo) {
-    fullPrompt = `Create a ${style}, ${resolutionText} resolution lyrics video with animated text for the following lyrics. The background visuals should be based on this description: "${prompt}".\n\nLyrics:\n${lyrics}`;
+    const fontFamily = fontSelect.value;
+    const fontSize = fontSizeInput.value;
+    const fontColor = fontColorInput.value;
+    const animationStyle = animationSelect.options[animationSelect.selectedIndex].text;
+
+    fullPrompt = `Create a ${style}, ${resolutionText} resolution lyrics video with animated text for the following lyrics. The background visuals should be based on this description: "${prompt}".
+
+Text Style Instructions:
+- Animate the lyrics with a "${animationStyle}" effect.
+- The text should use the "${fontFamily}" font.
+- Set the font size to approximately ${fontSize}px.
+- The font color should be a hex value of "${fontColor}".
+
+Lyrics:
+${lyrics}`;
   } else {
     fullPrompt = `A ${style}, ${resolutionText} resolution music video of ${prompt}`;
   }
@@ -823,7 +863,37 @@ async function generateVideo() {
 
   videoPlayer.src = videoUrl;
   videoResult.style.display = 'flex';
+  shareVideoBtn.classList.remove('hidden');
 }
+
+/**
+ * Handles showing the share modal and populating links.
+ */
+function handleShareClick() {
+  const url = window.location.href;
+  const text = "Check out this video I made with the AI Music Video Generator!";
+
+  shareLinkInput.value = url;
+
+  shareTwitter.href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+  shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+  shareReddit.href = `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`;
+
+  shareModal.classList.remove('hidden');
+}
+
+/**
+ * Copies the share link to the clipboard.
+ */
+function copyShareLink() {
+  shareLinkInput.select();
+  document.execCommand('copy');
+  copyLinkBtn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+  setTimeout(() => {
+    copyLinkBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy';
+  }, 2000);
+}
+
 
 /**
  * Handles downloading the generated video.
