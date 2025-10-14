@@ -13,12 +13,14 @@ const App: React.FC = () => {
   return (
     <div className="container">
       <header className="app-header">
-        <img
-          id="app-logo"
-          className="app-logo"
-          src={logoUrl || ''}
-          alt="AI Music Video Generator Logo"
-        />
+        {logoUrl && (
+          <img
+            id="app-logo"
+            className="app-logo"
+            src={logoUrl}
+            alt="AI Music Video Generator Logo"
+          />
+        )}
         <h1>AI Music Video Generator</h1>
         <p>Your complete toolkit for audio analysis and music video creation.</p>
       </header>
