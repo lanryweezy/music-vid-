@@ -1,5 +1,11 @@
 import { GoogleGenAI, Modality, Type } from '@google/genai';
-import { Style, Resolution, VideoType } from '../context/AppContext';
+import {
+	Style,
+	Resolution,
+	VideoType,
+	FontFamily,
+	AnimationStyle,
+} from "../context/AppContext";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
 
@@ -42,6 +48,8 @@ export const generateLogo = async (): Promise<string> => {
 export interface AnalysisResult {
   bpm: number;
   chords: string[];
+  key: string;
+  structure: { part: string; start: number; end: number }[];
 }
 
 export const analyzeAudio = async (
@@ -49,10 +57,11 @@ export const analyzeAudio = async (
 ): Promise<AnalysisResult> => {
   try {
     const audioPart = await fileToGenerativePart(audioFile);
+    const promptText = `Analyze this audio file. Determine its BPM (Beats Per Minute), primary chord progression, musical key, and song structure (e.g., verse, chorus, bridge). Respond ONLY with a JSON object containing 'bpm' (as a number), 'chords' (as an array of strings), 'key' (as a string, e.g., "C Major"), and 'structure' (as an array of objects with 'part', 'start', and 'end' time in seconds).`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: { parts: [audioPart, { text: prompt }] },
+      contents: { parts: [audioPart, { text: promptText }] },
       config: {
         responseMimeType: 'application/json',
         responseSchema: {
@@ -62,6 +71,18 @@ export const analyzeAudio = async (
             chords: {
               type: Type.ARRAY,
               items: { type: Type.STRING },
+            },
+            key: { type: Type.STRING },
+            structure: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  part: { type: Type.STRING },
+                  start: { type: Type.NUMBER },
+                  end: { type: Type.NUMBER },
+                },
+              },
             },
           },
         },
@@ -115,19 +136,34 @@ export interface GenerateVideoOptions {
   videoType: VideoType;
   lyrics: string;
   imageFile?: File;
+  fontFamily: FontFamily;
+  fontSize: number;
+  fontColor: string;
+  animationStyle: AnimationStyle;
 }
 
 export const generateVideo = async (
   options: GenerateVideoOptions
 ): Promise<Blob> => {
   try {
-    const { prompt, style, resolution, videoType, lyrics, imageFile } = options;
+    const {
+			prompt,
+			style,
+			resolution,
+			videoType,
+			lyrics,
+			imageFile,
+			fontFamily,
+			fontSize,
+			fontColor,
+			animationStyle,
+		} = options;
     const resolutionText =
       resolution === '1080p' ? 'Full HD 1080p' : 'HD 720p';
 
     let fullPrompt = '';
     if (videoType === 'lyrics') {
-      fullPrompt = `Create a ${style}, ${resolutionText} resolution lyrics video with animated text for the following lyrics. The background visuals should be based on this description: "${prompt}".\n\nLyrics:\n${lyrics}`;
+      fullPrompt = `Create a ${style}, ${resolutionText} resolution lyrics video. The background visuals should be based on this description: "${prompt}". The lyrics should be displayed with the following styling: Font Family: ${fontFamily}, Font Size: ${fontSize}px, Font Color: ${fontColor}, Animation Style: ${animationStyle}.\n\nLyrics:\n${lyrics}`;
     } else {
       fullPrompt = `A ${style}, ${resolutionText} resolution music video of ${prompt}`;
     }
