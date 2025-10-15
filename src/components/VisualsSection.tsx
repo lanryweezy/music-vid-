@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAppState } from '../context/AppStateContext';
+import { useAppContext } from '../context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { PromptEditor } from './PromptEditor';
 import { StyleSelector } from './StyleSelector';
@@ -8,7 +8,7 @@ import { VideoTypeSelector } from './VideoTypeSelector';
 import { LyricsEditor } from './LyricsEditor';
 
 export const VisualsSection: React.FC = () => {
-  const { videoType } = useAppState();
+  const { videoType } = useAppContext();
 
   return (
     <Card>

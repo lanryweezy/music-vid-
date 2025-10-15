@@ -1,27 +1,34 @@
 import React from 'react';
-import { useAppState } from '../context/AppStateContext';
-import { useFileUpload } from '../hooks/useFileUpload';
-import { useAudioAnalysis } from '../hooks/useAudioAnalysis';
+import { useAppContext } from '../context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { FileUpload } from './ui';
 import { AudioAnalysis } from './AudioAnalysis';
 
 export const UploadSection: React.FC = () => {
-  const { audioFile, setAudioFile, sourceImageFile, setSourceImageFile } = useAppState();
+  const { 
+    audioFile, 
+    setAudioFile, 
+    sourceImageFile, 
+    setSourceImageFile,
+    analysisResult,
+    isAnalyzing,
+    analyzeAudio,
+    metronomeBpm,
+    toggleMetronome,
+    isMetronomePlaying
+  } = useAppContext();
   
-  const audioUpload = useFileUpload({
-    maxSize: 100,
-    acceptedTypes: ['audio/*'],
-    onFileSelect: setAudioFile,
-  });
+  const handleAudioFileSelect = (file: File | null) => {
+    setAudioFile(file);
+    // Reset analysis when a new file is selected
+    if (!file) {
+      // Optionally reset other related states
+    }
+  };
 
-  const imageUpload = useFileUpload({
-    maxSize: 50,
-    acceptedTypes: ['image/*'],
-    onFileSelect: setSourceImageFile,
-  });
-
-  const audioAnalysis = useAudioAnalysis();
+  const handleImageFileSelect = (file: File | null) => {
+    setSourceImageFile(file);
+  };
 
   return (
     <>
@@ -38,16 +45,24 @@ export const UploadSection: React.FC = () => {
           <div className="space-y-2">
             <label className="text-sm font-medium">Audio File</label>
             <FileUpload
-              {...audioUpload}
+              onFileSelect={handleAudioFileSelect}
+              maxSize={100}
+              acceptedTypes={['audio/*']}
               placeholder="Drop your audio file here or click to browse"
               icon="fa-music"
+              currentFile={audioFile}
             />
           </div>
 
           {audioFile && (
-            <AudioAnalysis 
+            <AudioAnalysis
               audioFile={audioFile}
-              {...audioAnalysis}
+              analysisResult={analysisResult}
+              isAnalyzing={isAnalyzing}
+              onAnalyze={analyzeAudio}
+              metronomeBpm={metronomeBpm}
+              toggleMetronome={toggleMetronome}
+              isMetronomePlaying={isMetronomePlaying}
             />
           )}
         </CardContent>
@@ -66,9 +81,12 @@ export const UploadSection: React.FC = () => {
           <div className="space-y-2">
             <label className="text-sm font-medium">Image File</label>
             <FileUpload
-              {...imageUpload}
+              onFileSelect={handleImageFileSelect}
+              maxSize={50}
+              acceptedTypes={['image/*']}
               placeholder="Drop your image here or click to browse"
               icon="fa-image"
+              currentFile={sourceImageFile}
             />
           </div>
         </CardContent>

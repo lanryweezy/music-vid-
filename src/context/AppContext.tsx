@@ -12,6 +12,11 @@ import {
 	editImage,
 	generateVideo,
 } from "../services/gemini";
+import {
+	generateAdvancedMusicVideo,
+	generateImageSequenceForAnimation,
+	createAnimationFromImageSequence
+} from "../services/musicVideoGenerator";
 
 export type Style =
 	| "cinematic"
@@ -82,6 +87,9 @@ interface IAppContext {
 	setFontColor: (color: string) => void;
 	animationStyle: AnimationStyle;
 	setAnimationStyle: (style: AnimationStyle) => void;
+	// New advanced features
+	generateAdvancedMusicVideo: () => void;
+	isGeneratingAdvanced: boolean;
 }
 
 // Create the context
@@ -161,21 +169,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
 	const [fontColor, setFontColor] = useState("#FFFFFF");
 	const [animationStyle, setAnimationStyle] =
 		useState<AnimationStyle>("fade");
+	
+	// New state for advanced music video generation
+	const [isGeneratingAdvanced, setIsGeneratingAdvanced] = useState(false);
 
-<<<<<<< HEAD
-  const fetchLogo = async () => {
-    try {
-      const url = await generateLogo();
-      setLogoUrl(url);
-    } catch (error) {
-      console.error('Failed to fetch logo:', error);
-      // Don't set error state for logo generation failure
-      // This prevents it from interfering with the output area
-      setLogoUrl(null);
-    }
-  };
-=======
-	const fetchLogo = useCallback(async () => {
+  const fetchLogo = useCallback(async () => {
 		try {
 			const url = await generateLogo();
 			setLogoUrl(url);
@@ -184,7 +182,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
 			setError("Failed to generate logo.");
 		}
 	}, []);
->>>>>>> d8b7266df24089474b6aaca80df967dbb743665c
 
 	const handleAnalyzeAudio = async () => {
 		if (!audioFile) return;
@@ -254,6 +251,44 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
 		setIsMetronomePlaying(!isMetronomePlaying);
 	};
 
+	const handleGenerateAdvancedMusicVideo = async () => {
+		if (!audioFile) {
+			setError("Please upload an audio file first.");
+			return;
+		}
+
+		setIsGeneratingAdvanced(true);
+		setError(null);
+		setGeneratedImageUrl(null);
+		setGeneratedVideoUrl(null);
+
+		const loadingInterval = setInterval(() => {
+			setLoadingMessage(
+				loadingMessages[Math.floor(Math.random() * loadingMessages.length)]
+			);
+		}, 2000);
+
+		try {
+			const videoBlob = await generateAdvancedMusicVideo(
+				audioFile,
+				prompt,
+				style,
+				resolution,
+				(progress, stage) => {
+					setLoadingMessage(`${stage} (${Math.round(progress)}%)`);
+				}
+			);
+			
+			setGeneratedVideoUrl(URL.createObjectURL(videoBlob));
+		} catch (error) {
+			console.error("Advanced music video generation failed:", error);
+			setError("Advanced music video generation failed.");
+		} finally {
+			setIsGeneratingAdvanced(false);
+			clearInterval(loadingInterval);
+		}
+	};
+
 	const value = {
 		audioFile,
 		setAudioFile,
@@ -295,6 +330,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
 		setFontColor,
 		animationStyle,
 		setAnimationStyle,
+		// New advanced features
+		generateAdvancedMusicVideo: handleGenerateAdvancedMusicVideo,
+		isGeneratingAdvanced,
 	};
 
 	return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

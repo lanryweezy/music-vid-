@@ -1,15 +1,22 @@
 import React from 'react';
-import { useAppState } from '../../context/AppStateContext';
-import { useVideoGeneration } from '../../hooks/useVideoGeneration';
+import { useAppContext } from '../../context/AppContext';
+import { AdvancedMusicVideoSection } from '../AdvancedMusicVideoSection';
 import { UploadSection } from '../UploadSection';
 import { VisualsSection } from '../VisualsSection';
 import { GenerateSection } from '../GenerateSection';
 
 export const ControlsPanel: React.FC = () => {
-  const { audioFile, sourceImageFile, prompt } = useAppState();
-  const { isGenerating, generate } = useVideoGeneration();
+  const { 
+    audioFile, 
+    sourceImageFile, 
+    prompt, 
+    isGenerating, 
+    isGeneratingAdvanced,
+    generate,
+    generateAdvancedMusicVideo
+  } = useAppContext();
 
-  const isGenerateDisabled = (!audioFile && !sourceImageFile) || !prompt.trim() || isGenerating;
+  const isGenerateDisabled = (!audioFile && !sourceImageFile) || !prompt.trim() || isGenerating || isGeneratingAdvanced;
 
   return (
     <div className="controls-panel">
@@ -22,6 +29,9 @@ export const ControlsPanel: React.FC = () => {
         isGenerating={isGenerating}
         onGenerate={generate}
       />
+      <div className="mt-6">
+        <AdvancedMusicVideoSection />
+      </div>
     </div>
   );
 };

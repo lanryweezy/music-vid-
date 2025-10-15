@@ -1,19 +1,8 @@
 import React from 'react';
-import { useAppState } from '../context/AppStateContext';
-import { useVideoGeneration } from '../hooks/useVideoGeneration';
+import { useAppContext } from '../context/AppContext';
 import { Button, LoadingSpinner } from './ui';
 
-interface GenerateSectionProps {
-  isDisabled: boolean;
-  isGenerating: boolean;
-  onGenerate: (params: any, audioFile?: File) => Promise<void>;
-}
-
-export const GenerateSection: React.FC<GenerateSectionProps> = ({
-  isDisabled,
-  isGenerating,
-  onGenerate,
-}) => {
+export const GenerateSection: React.FC = () => {
   const { 
     audioFile, 
     sourceImageFile, 
@@ -21,8 +10,11 @@ export const GenerateSection: React.FC<GenerateSectionProps> = ({
     style, 
     resolution, 
     videoType, 
-    lyrics 
-  } = useAppState();
+    lyrics,
+    isGenerating,
+    generate,
+    error
+  } = useAppContext();
 
   const handleGenerate = async () => {
     const params = {
@@ -32,10 +24,17 @@ export const GenerateSection: React.FC<GenerateSectionProps> = ({
       videoType,
       lyrics: videoType === 'lyrics' ? lyrics : undefined,
       imageFile: sourceImageFile || undefined,
+      fontFamily: 'Arial',
+      fontSize: 24,
+      fontColor: '#FFFFFF',
+      animationStyle: 'fade' as const,
     };
 
-    await onGenerate(params, audioFile || undefined);
+    const audioFileRef = audioFile || undefined;
+    generate();
   };
+
+  const isDisabled = (!audioFile && !sourceImageFile) || !prompt.trim() || isGenerating;
 
   const getButtonText = () => {
     if (sourceImageFile && !audioFile) {
@@ -84,6 +83,11 @@ export const GenerateSection: React.FC<GenerateSectionProps> = ({
           </>
         )}
       </Button>
+      {error && (
+        <div className="mt-2 p-2 bg-red-100 text-red-700 rounded text-sm">
+          {error}
+        </div>
+      )}
     </div>
   );
 };

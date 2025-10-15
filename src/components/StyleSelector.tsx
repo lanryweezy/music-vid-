@@ -1,9 +1,8 @@
 import React from 'react';
-import { useAppState } from '../context/AppStateContext';
-import { Style } from '../context/AppContext';
+import { useAppContext } from '../context/AppContext';
 
 export const StyleSelector: React.FC = () => {
-  const { style, setStyle } = useAppState();
+  const { style, setStyle } = useAppContext();
 
   const styleOptions = [
     { value: 'cinematic', label: 'Cinematic', icon: 'fa-film', description: 'Hollywood-style visuals' },

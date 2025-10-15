@@ -1,5 +1,5 @@
 import React from 'react';
-import { useVideoGeneration } from '../../hooks/useVideoGeneration';
+import { useAppContext } from '../../context/AppContext';
 import { VideoPlayer } from '../VideoPlayer';
 import { LoadingState } from '../LoadingState';
 import { ErrorState } from '../ErrorState';
@@ -7,18 +7,19 @@ import { ErrorState } from '../ErrorState';
 export const OutputArea: React.FC = () => {
   const { 
     isGenerating, 
+    isGeneratingAdvanced,
     error, 
     generatedImageUrl, 
     generatedVideoUrl 
-  } = useVideoGeneration();
+  } = useAppContext();
 
   const hasContent = generatedImageUrl || generatedVideoUrl;
 
   return (
     <div className={`output-area ${hasContent ? 'has-content' : ''}`}>
-      {isGenerating && <LoadingState />}
+      {(isGenerating || isGeneratingAdvanced) && <LoadingState />}
       
-      {!isGenerating && !hasContent && !error && (
+      {!(isGenerating || isGeneratingAdvanced) && !hasContent && !error && (
         <VideoPlayer.Placeholder />
       )}
       

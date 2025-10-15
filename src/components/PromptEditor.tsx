@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useAppState } from '../context/AppStateContext';
+import { useAppContext } from '../context/AppContext';
 import { Textarea } from './ui/textarea';
 
 export const PromptEditor: React.FC = () => {
-  const { prompt, setPrompt } = useAppState();
+  const { prompt, setPrompt } = useAppContext();
 
   const addToPrompt = (text: string) => {
     const newPrompt = prompt ? `${prompt}, ${text}` : text;
