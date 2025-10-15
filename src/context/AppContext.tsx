@@ -82,7 +82,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
       setLogoUrl(url);
     } catch (error) {
       console.error('Failed to fetch logo:', error);
-      setError('Failed to generate logo.');
+      // Don't set error state for logo generation failure
+      // This prevents it from interfering with the output area
+      setLogoUrl(null);
     }
   };
 

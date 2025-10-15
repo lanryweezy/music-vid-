@@ -1,9 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, FileUpload, Slider, Toggle, LoadingSpinner } from './ui';
 
 const UploadAndAnalyzeSection: React.FC = () => {
   const {
@@ -14,12 +11,15 @@ const UploadAndAnalyzeSection: React.FC = () => {
     analyzeAudio,
   } = useAppContext();
 
-  const handleAudioUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      setAudioFile(event.target.files[0]);
-    } else {
-      setAudioFile(null);
-    }
+  const [metronomeBpm, setMetronomeBpm] = useState(120);
+  const [isMetronomePlaying, setIsMetronomePlaying] = useState(false);
+
+  const handleAudioUpload = (file: File | null) => {
+    setAudioFile(file);
+  };
+
+  const handleMetronomeToggle = () => {
+    setIsMetronomePlaying(!isMetronomePlaying);
   };
 
   return (
@@ -33,24 +33,36 @@ const UploadAndAnalyzeSection: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid w-full max-w-sm items-center gap-1.5">
-          <Label htmlFor="audio-upload">Audio File</Label>
-          <Input id="audio-upload" type="file" accept="audio/*" onChange={handleAudioUpload} />
-          <p className="text-sm text-muted-foreground">
-            {audioFile ? audioFile.name : 'No file selected.'}
-          </p>
+        <div className="space-y-2">
+          <Label>Audio File</Label>
+          <FileUpload
+            accept="audio/*"
+            onFileSelect={handleAudioUpload}
+            selectedFile={audioFile}
+            placeholder="Drop your audio file here or click to browse"
+            icon="fa-music"
+            maxSize={100}
+          />
         </div>
 
         <div className="musicians-toolkit space-y-4">
-          <h3 className="text-lg font-semibold">Musician's Toolkit</h3>
           <Button
             onClick={analyzeAudio}
             disabled={!audioFile || isAnalyzing}
-            className="w-full"
+            className="w-full analyze-button"
           >
-            {isAnalyzing ? 'Analyzing...' : 'Analyze Audio'}
+            {isAnalyzing ? (
+              <>
+                <LoadingSpinner size="sm" />
+                Analyzing Audio...
+              </>
+            ) : (
+              <>
+                <i className="fa-solid fa-chart-line"></i>
+                Analyze Audio
+              </>
+            )}
           </Button>
-          {isAnalyzing && <div className="loader-small mx-auto"></div>}
           {analysisResult && (
             <div className="analysis-result space-y-2">
               <div className="flex justify-between">
@@ -64,20 +76,29 @@ const UploadAndAnalyzeSection: React.FC = () => {
             </div>
           )}
           <div className="metronome">
-            <h4 className="font-semibold">Metronome</h4>
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                defaultValue={
-                  analysisResult ? Math.round(analysisResult.bpm) : 120
-                }
-                min="40"
-                max="240"
-                className="w-20"
+            <h4 className="font-semibold flex items-center gap-2">
+              <i className="fa-solid fa-drum"></i>
+              Metronome
+            </h4>
+            <div className="metronome-controls">
+              <Slider
+                value={analysisResult ? Math.round(analysisResult.bpm) : metronomeBpm}
+                onChange={setMetronomeBpm}
+                min={40}
+                max={240}
+                step={1}
+                label="BPM"
+                unit=""
+                className="metronome-slider"
               />
-              <Button variant="outline" size="icon">
-                <i className="fa-solid fa-play"></i>
-              </Button>
+              <Toggle
+                checked={isMetronomePlaying}
+                onChange={handleMetronomeToggle}
+                label={isMetronomePlaying ? "Playing" : "Stopped"}
+                description={isMetronomePlaying ? `Clicking at ${metronomeBpm} BPM` : "Click to start metronome"}
+                size="md"
+                className="metronome-toggle"
+              />
             </div>
           </div>
         </div>

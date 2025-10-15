@@ -1,7 +1,12 @@
 import { GoogleGenAI, Modality, Type } from '@google/genai';
 import { Style, Resolution, VideoType } from '../context/AppContext';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+// Check if API key is defined
+if (!process.env.API_KEY) {
+  console.warn('API_KEY is not defined. Gemini services will not work.');
+}
+
+const ai = process.env.API_KEY ? new GoogleGenAI({ apiKey: process.env.API_KEY }) : null;
 
 const fileToGenerativePart = async (file: File) => {
   const base64EncodedDataPromise = new Promise((resolve) => {
@@ -15,6 +20,10 @@ const fileToGenerativePart = async (file: File) => {
 };
 
 export const generateLogo = async (): Promise<string> => {
+  if (!ai) {
+    throw new Error('AI service is not initialized. Please provide an API key.');
+  }
+  
   try {
     const response = await ai.models.generateImages({
       model: 'imagen-4.0-generate-001',
@@ -47,12 +56,23 @@ export interface AnalysisResult {
 export const analyzeAudio = async (
   audioFile: File
 ): Promise<AnalysisResult> => {
+  if (!ai) {
+    throw new Error('AI service is not initialized. Please provide an API key.');
+  }
+  
   try {
     const audioPart = await fileToGenerativePart(audioFile);
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: { parts: [audioPart, { text: prompt }] },
+      contents: { 
+        parts: [
+          audioPart, 
+          { 
+            text: "Analyze this audio file and extract the BPM (beats per minute) and the main chords used in the song. Return the result as a JSON object with 'bpm' as a number and 'chords' as an array of strings." 
+          }
+        ] 
+      },
       config: {
         responseMimeType: 'application/json',
         responseSchema: {
@@ -81,6 +101,10 @@ export const editImage = async (
   imageFile: File,
   prompt: string
 ): Promise<Blob> => {
+  if (!ai) {
+    throw new Error('AI service is not initialized. Please provide an API key.');
+  }
+  
   try {
     const imagePart = await fileToGenerativePart(imageFile);
     const textPart = { text: prompt };
@@ -120,6 +144,10 @@ export interface GenerateVideoOptions {
 export const generateVideo = async (
   options: GenerateVideoOptions
 ): Promise<Blob> => {
+  if (!ai) {
+    throw new Error('AI service is not initialized. Please provide an API key.');
+  }
+  
   try {
     const { prompt, style, resolution, videoType, lyrics, imageFile } = options;
     const resolutionText =
@@ -127,7 +155,10 @@ export const generateVideo = async (
 
     let fullPrompt = '';
     if (videoType === 'lyrics') {
-      fullPrompt = `Create a ${style}, ${resolutionText} resolution lyrics video with animated text for the following lyrics. The background visuals should be based on this description: "${prompt}".\n\nLyrics:\n${lyrics}`;
+      fullPrompt = `Create a ${style}, ${resolutionText} resolution lyrics video with animated text for the following lyrics. The background visuals should be based on this description: "${prompt}".
+
+Lyrics:
+${lyrics}`;
     } else {
       fullPrompt = `A ${style}, ${resolutionText} resolution music video of ${prompt}`;
     }

@@ -9,25 +9,65 @@ const OutputArea: React.FC = () => {
     generatedVideoUrl,
   } = useAppContext();
 
+  // Only show content if we have actual generated content, not just any error
+  const hasContent = generatedImageUrl || generatedVideoUrl;
+  const hasRelevantError = error && !error.includes('logo'); // Ignore logo errors
+
   return (
-    <div id="output-area" className="output-area">
+    <div id="output-area" className={`output-area ${hasContent ? 'has-content' : ''}`}>
       {isGenerating && (
         <div id="loader" className="loader">
           <div className="spinner"></div>
-          <p id="loading-message">Generating...</p>
+          <p id="loading-message">Generating your amazing visuals...</p>
         </div>
       )}
 
-      {!isGenerating && !generatedImageUrl && !generatedVideoUrl && !error && (
+      {!isGenerating && !generatedImageUrl && !generatedVideoUrl && !hasRelevantError && (
         <div id="output-placeholder" className="output-placeholder">
-          <div className="placeholder-icon-wrapper">
-            <i className="fa-solid fa-clapperboard"></i>
+          <div className="video-player-placeholder">
+            <div className="video-player-frame">
+              <div className="video-player-screen">
+                <div className="play-button-overlay">
+                  <i className="fa-solid fa-play"></i>
+                </div>
+                <div className="video-player-controls">
+                  <div className="progress-bar-placeholder"></div>
+                  <div className="control-buttons">
+                    <i className="fa-solid fa-play"></i>
+                    <i className="fa-solid fa-volume-high"></i>
+                    <i className="fa-solid fa-expand"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <p>Your generated visuals will appear here.</p>
+          <div className="placeholder-content">
+            <h3>Ready to Create Magic?</h3>
+            <p>Upload your audio file and describe your vision to generate stunning visuals</p>
+            <div className="placeholder-features">
+              <div className="feature-item">
+                <i className="fa-solid fa-music"></i>
+                <span>Audio Analysis</span>
+              </div>
+              <div className="feature-item">
+                <i className="fa-solid fa-palette"></i>
+                <span>AI Visuals</span>
+              </div>
+              <div className="feature-item">
+                <i className="fa-solid fa-download"></i>
+                <span>HD Download</span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-      {error && <p className="error">{error}</p>}
+      {hasRelevantError && (
+        <div className="error-container">
+          <i className="fa-solid fa-exclamation-triangle error-icon"></i>
+          <p className="error">{error}</p>
+        </div>
+      )}
 
       {generatedImageUrl && (
         <div id="image-result" className="image-result">

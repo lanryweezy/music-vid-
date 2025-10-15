@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, FileUpload } from './ui';
 
 const ImageUploadSection: React.FC = () => {
   const { sourceImageFile, setSourceImageFile } = useAppContext();
@@ -21,16 +18,8 @@ const ImageUploadSection: React.FC = () => {
     }
   }, [sourceImageFile]);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      setSourceImageFile(event.target.files[0]);
-    } else {
-      setSourceImageFile(null);
-    }
-  };
-
-  const clearImage = () => {
-    setSourceImageFile(null);
+  const handleImageUpload = (file: File | null) => {
+    setSourceImageFile(file);
   };
 
   return (
@@ -44,21 +33,25 @@ const ImageUploadSection: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid w-full max-w-sm items-center gap-1.5">
-          <Label htmlFor="image-upload">Image File</Label>
-          <Input id="image-upload" type="file" accept="image/*" onChange={handleImageUpload} />
+        <div className="space-y-2">
+          <Label>Image File (Optional)</Label>
+          <FileUpload
+            accept="image/*"
+            onFileSelect={handleImageUpload}
+            selectedFile={sourceImageFile}
+            placeholder="Drop your image here or click to browse"
+            icon="fa-image"
+            maxSize={50}
+          />
         </div>
         {previewUrl && (
-          <div className="relative">
-            <img src={previewUrl} alt="Image Preview" className="rounded-md" />
-            <Button
-              variant="destructive"
-              size="icon"
-              className="absolute top-2 right-2"
-              onClick={clearImage}
-            >
-              <i className="fa-solid fa-xmark"></i>
-            </Button>
+          <div className="image-preview-container">
+            <div className="image-preview-header">
+              <h4 className="image-preview-title">Image Preview</h4>
+            </div>
+            <div className="image-preview-wrapper">
+              <img src={previewUrl} alt="Image Preview" className="image-preview" />
+            </div>
           </div>
         )}
       </CardContent>
