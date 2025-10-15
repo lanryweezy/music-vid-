@@ -159,7 +159,7 @@ export interface GenerateVideoOptions {
   animationStyle: AnimationStyle;
 }
 
-// Enhanced function to generate multiple images for video creation
+// Enhanced function to generate multiple images for video creation using Google's Imagen model
 export const generateMultipleImages = async (
   prompt: string,
   style: Style,
@@ -174,7 +174,7 @@ export const generateMultipleImages = async (
     const enhancedPrompt = `Create ${count} distinct and connected images for a ${style} style music video based on this theme: ${prompt}. Each image should represent different visual elements that flow together to match the song's mood and rhythm. Maintain visual consistency across all images.`;
     
     const response = await ai.models.generateImages({
-      model: 'imagen-4.0-generate-001',
+      model: 'imagen-4.0-generate-001', // Google's Imagen 4.0 model for image generation
       prompt: enhancedPrompt,
       config: {
         numberOfImages: count,
@@ -196,7 +196,7 @@ export const generateMultipleImages = async (
   }
 };
 
-// Function to create a video by animating multiple generated images
+// Function to create a video by animating multiple generated images using Google's Veo model
 export const createVideoFromImages = async (
   imageUrls: string[],
   audioFile: File
@@ -212,9 +212,9 @@ export const createVideoFromImages = async (
     // Create a prompt for video generation that uses the images as reference
     const prompt = `Create a high-quality music video that seamlessly transitions between visual scenes. Use the provided images as reference for the visual style and content. Synchronize the visual transitions with the audio rhythm and mood to create a cohesive music video experience.`;
     
-    // Create a video from the generated images
+    // Create a video from the generated images using Google's Veo model
     let operation = await ai.models.generateVideos({
-      model: 'veo-3.0-generate-001', // Using the latest Veo model if available
+      model: 'veo-3.0-generate-001', // Google's Veo 3.0 model for video generation
       prompt: prompt,
       config: {
         numberOfVideos: 1,

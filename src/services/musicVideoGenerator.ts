@@ -19,10 +19,10 @@ const fileToGenerativePart = async (file: File) => {
 };
 
 /**
- * Advanced music video generation workflow
+ * Advanced music video generation workflow using Google's Imagen and Veo models
  * 1. Analyzes the audio file to understand rhythm, tempo, and mood
- * 2. Generates multiple related images based on the theme and audio analysis
- * 3. Creates a coherent video from the generated images synchronized to the audio
+ * 2. Generates multiple related images using Google's Imagen model based on the theme and audio analysis
+ * 3. Creates a coherent video from the generated images synchronized to the audio using Google's Veo model
  */
 export const generateAdvancedMusicVideo = async (
   audioFile: File,
@@ -40,12 +40,12 @@ export const generateAdvancedMusicVideo = async (
     onProgress?.(10, 'Analyzing audio...');
     const audioAnalysis = await analyzeAudioForVideoGeneration(audioFile);
     
-    // Stage 2: Generate multiple related images based on the prompt and analysis
-    onProgress?.(30, 'Generating visual scenes...');
+    // Stage 2: Generate multiple related images based on the prompt and analysis using Google's Imagen model
+    onProgress?.(30, 'Generating visual scenes with Imagen model...');
     const imageUrls = await generateMultipleVisualScenes(prompt, style, audioAnalysis);
 
-    // Stage 3: Generate video from images and audio
-    onProgress?.(70, 'Creating music video...');
+    // Stage 3: Generate video from images and audio using Google's Veo model
+    onProgress?.(70, 'Creating music video with Veo model...');
     const videoBlob = await createVideoFromScenesAndAudio(
       imageUrls,
       audioFile,
