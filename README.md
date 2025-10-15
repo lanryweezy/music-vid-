@@ -16,12 +16,21 @@
     ```
 3.  Create a `.env` file in the root of the project and add your Gemini API key:
     ```
-    GEMINI_API_KEY=your_api_key
+    VITE_GEMINI_API_KEY=your_api_key
     ```
 4.  Run the app
     ```sh
     npm run dev
     ```
+
+## Vercel Deployment
+
+1.  **Fork this repository.**
+2.  **Create a new project on Vercel and import your forked repository.**
+3.  **Configure Environment Variables:**
+    -   In the Vercel project settings, go to the "Environment Variables" section.
+    -   Add a new environment variable named `VITE_GEMINI_API_KEY` and paste your Gemini API key as the value.
+4.  **Deploy:** Vercel will automatically build and deploy your application.
 
 ## Usage
 
