@@ -160,6 +160,12 @@ const generateMultipleVisualScenes = async (
   }
 };
 
+const base64ToGenerativePart = async (base64: string, mimeType: string) => {
+  return {
+    inlineData: { data: base64.split(',')[1], mimeType },
+  };
+};
+
 /**
  * Create a video from the generated scenes and synchronized with audio
  */
@@ -179,11 +185,14 @@ const createVideoFromScenesAndAudio = async (
     const resolutionText = resolution === '1080p' ? 'Full HD 1080p' : 'HD 720p';
     const promptText = `Create a ${style} style, ${resolutionText} resolution music video using these visual scenes as reference. The video should be synchronized to the provided audio with scene transitions matching the beat and musical sections. The overall mood should match "${audioAnalysis.overallMood}". Visuals should be dynamic and flow smoothly between scenes. BPM is ${audioAnalysis.bpm}.`;
 
-    // For now, we'll use the Veo model to generate a video based on the combined prompt
-    // In a more advanced implementation, we would generate a video directly from the images
+    const imageParts = await Promise.all(imageUrls.map(url => base64ToGenerativePart(url, 'image/png')));
+    const audioPart = await fileToGenerativePart(audioFile);
+
     let operation = await ai.models.generateVideos({
-      model: 'veo-3.0-generate-001',
+      model: 'veo-3.1-generate-001',
       prompt: promptText,
+      image: imageParts,
+      audio: audioPart,
       config: {
         numberOfVideos: 1,
       },
@@ -275,9 +284,14 @@ export const createAnimationFromImageSequence = async (
       promptText += ` Synchronize the animation transitions with the provided audio track.`;
     }
 
+    const imageParts = await Promise.all(imageUrls.map(url => base64ToGenerativePart(url, 'image/png')));
+    const audioPart = audioFile ? await fileToGenerativePart(audioFile) : undefined;
+
     let operation = await ai.models.generateVideos({
-      model: 'veo-3.0-generate-001',
+      model: 'veo-3.1-generate-001',
       prompt: promptText,
+      image: imageParts,
+      audio: audioPart,
       config: {
         numberOfVideos: 1,
       },

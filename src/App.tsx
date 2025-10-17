@@ -18,7 +18,6 @@ const App: React.FC = () => {
   return (
     <div className="container">
       <header className="app-header">
-<<<<<<< HEAD
         <div className="header-content">
           {logoUrl && (
             <img
@@ -34,18 +33,6 @@ const App: React.FC = () => {
           </div>
         </div>
         <ProgressIndicator />
-=======
-        {logoUrl && (
-          <img
-            id="app-logo"
-            className="app-logo"
-            src={logoUrl}
-            alt="AI Music Video Generator Logo"
-          />
-        )}
-        <h1>AI Music Video Generator</h1>
-        <p>Your complete toolkit for audio analysis and music video creation.</p>
->>>>>>> d8b7266df24089474b6aaca80df967dbb743665c
       </header>
       <main className="app-main">
         <div className="main-content">

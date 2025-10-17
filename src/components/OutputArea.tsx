@@ -11,17 +11,29 @@ const OutputArea: React.FC = () => {
 		loadingMessage,
 	} = useAppContext();
 
-<<<<<<< HEAD
   // Only show content if we have actual generated content, not just any error
   const hasContent = generatedImageUrl || generatedVideoUrl;
   const hasRelevantError = error && !error.includes('logo'); // Ignore logo errors
+
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  const handleDownload = (url: string, filename: string) => {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const shareUrl = generatedVideoUrl || generatedImageUrl || "";
 
   return (
     <div id="output-area" className={`output-area ${hasContent ? 'has-content' : ''}`}>
       {isGenerating && (
         <div id="loader" className="loader">
           <div className="spinner"></div>
-          <p id="loading-message">Generating your amazing visuals...</p>
+          <p id="loading-message">{loadingMessage}</p>
         </div>
       )}
 
@@ -71,40 +83,6 @@ const OutputArea: React.FC = () => {
           <p className="error">{error}</p>
         </div>
       )}
-=======
-	const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-
-	const handleDownload = (url: string, filename: string) => {
-		const a = document.createElement("a");
-		a.href = url;
-		a.download = filename;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-	};
-
-	const shareUrl = generatedVideoUrl || generatedImageUrl || "";
->>>>>>> d8b7266df24089474b6aaca80df967dbb743665c
-
-	return (
-		<div id="output-area" className="output-area">
-			{isGenerating && (
-				<div id="loader" className="loader">
-					<div className="spinner"></div>
-					<p id="loading-message">{loadingMessage}</p>
-				</div>
-			)}
-
-			{!isGenerating && !generatedImageUrl && !generatedVideoUrl && !error && (
-				<div id="output-placeholder" className="output-placeholder">
-					<div className="placeholder-icon-wrapper">
-						<i className="fa-solid fa-clapperboard"></i>
-					</div>
-					<p>Your generated visuals will appear here.</p>
-				</div>
-			)}
-
-			{error && <p className="error">{error}</p>}
 
 			{generatedImageUrl && (
 				<div id="image-result" className="image-result">

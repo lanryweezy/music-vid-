@@ -196,6 +196,12 @@ export const generateMultipleImages = async (
   }
 };
 
+const base64ToGenerativePart = async (base64: string, mimeType: string) => {
+  return {
+    inlineData: { data: base64.split(',')[1], mimeType },
+  };
+};
+
 // Function to create a video by animating multiple generated images using Google's Veo model
 export const createVideoFromImages = async (
   imageUrls: string[],
@@ -208,14 +214,17 @@ export const createVideoFromImages = async (
   try {
     // Convert the audio file to a generative part
     const audioPart = await fileToGenerativePart(audioFile);
+    const imageParts = await Promise.all(imageUrls.map(url => base64ToGenerativePart(url, 'image/png')));
     
     // Create a prompt for video generation that uses the images as reference
     const prompt = `Create a high-quality music video that seamlessly transitions between visual scenes. Use the provided images as reference for the visual style and content. Synchronize the visual transitions with the audio rhythm and mood to create a cohesive music video experience.`;
     
     // Create a video from the generated images using Google's Veo model
     let operation = await ai.models.generateVideos({
-      model: 'veo-3.0-generate-001', // Google's Veo 3.0 model for video generation
+      model: 'veo-3.1-generate-001', // Google's Veo 3.1 model for video generation
       prompt: prompt,
+      image: imageParts,
+      audio: audioPart,
       config: {
         numberOfVideos: 1,
       },
@@ -279,7 +288,7 @@ ${lyrics}`;
       const image = imageFile ? await fileToGenerativePart(imageFile) : undefined;
 
       let operation = await ai.models.generateVideos({
-        model: 'veo-2.0-generate-001',
+        model: 'veo-3.1-generate-001',
         prompt: fullPrompt,
         ...(image && {
           image: {
@@ -316,46 +325,11 @@ ${lyrics}`;
       const imageCount = 5; // Generate 5 different visual scenes
       const imageUrls = await generateMultipleImages(prompt, style, imageCount);
       
-      // For now, return a placeholder - in a real implementation we would create a video from images
-      // Since the Veo API doesn't directly support creating videos from a sequence of images yet,
-      // we can create a visual video with the enhanced prompt
-      const fullPrompt = `A ${style}, ${resolutionText} resolution music video based on this description: ${prompt}. Create a visually stunning sequence that flows with the rhythm and mood of the music. Include dynamic transitions between scenes that match the beat.`;
-
-      const image = imageFile ? await fileToGenerativePart(imageFile) : undefined;
-
-      let operation = await ai.models.generateVideos({
-        model: 'veo-3.0-generate-001',
-        prompt: fullPrompt,
-        ...(image && {
-          image: {
-            imageBytes: image.inlineData.data,
-            mimeType: image.inlineData.mimeType,
-          },
-        }),
-        config: {
-          numberOfVideos: 1,
-        },
-      });
-
-      // Poll for the result
-      while (!operation.done) {
-        await new Promise((resolve) => setTimeout(resolve, 10000));
-        operation = await ai.operations.getVideosOperation({ operation });
+      if (options.audioFile) {
+        return await createVideoFromImages(imageUrls, options.audioFile);
+      } else {
+        throw new Error("Audio file is required for visual video generation.");
       }
-
-      if (!operation.response?.generatedVideos?.[0]?.video?.uri) {
-        throw new Error('Video generation failed or returned no URI.');
-      }
-
-      const downloadLink = operation.response.generatedVideos[0].video.uri;
-      const videoResponse = await fetch(
-        `${downloadLink}&key=${process.env.API_KEY}`
-      );
-
-      if (!videoResponse.ok) {
-        throw new Error(`Failed to fetch video: ${videoResponse.statusText}`);
-      }
-      return await videoResponse.blob();
     }
   } catch (error) {
     console.error('Video generation failed:', error);
